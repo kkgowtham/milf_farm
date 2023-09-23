@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "774656595291",
+    "project_id": "diary-farm-cb0f6",
+    "storage_bucket": "diary-farm-cb0f6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:774656595291:android:031795e229e0e47550767e",
+        "android_client_info": {
+          "package_name": "com.diary.milk_farm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "774656595291-6fd7r7mkhs1ovibiak2j4e2qi0gikrj1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9Vo-ZeJqmh1YZToYjgatBRuiewfuCjMw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "774656595291-6fd7r7mkhs1ovibiak2j4e2qi0gikrj1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
