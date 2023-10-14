@@ -1,4 +1,4 @@
-package com.diary.milk_farm
+package com.diary.milkfarm
 
 import io.flutter.embedding.android.FlutterActivity
 

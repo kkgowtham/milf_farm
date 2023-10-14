@@ -197,4 +197,8 @@ extension DateUtils on DateTime {
   String get displayFormat {
     return DateFormat('MMM dd, yyyy').format(this);
   }
+
+  String get isoFormat {
+    return DateFormat('yyyy-MM-dd').format(this);
+  }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:milk_farm/days_screen.dart';
-import 'package:milk_farm/extensions.dart';
 
 class DayWiseWidget extends StatefulWidget {
   const DayWiseWidget({super.key});
@@ -26,9 +25,7 @@ class _DayWiseWidgetState extends State<DayWiseWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: context.height * 0.8,
-      width: context.width,
+    return Expanded(
       child: PageView.builder(
         controller: _controller,
         itemCount: dateList.length,

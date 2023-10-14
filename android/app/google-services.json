@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:774656595291:android:031795e229e0e47550767e",
+        "mobilesdk_app_id": "1:774656595291:android:20bab63746128b5c50767e",
         "android_client_info": {
-          "package_name": "com.diary.milk_farm"
+          "package_name": "com.diary.milkfarm"
         }
       },
       "oauth_client": [

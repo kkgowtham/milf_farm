@@ -1,32 +1,36 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:milk_farm/add_customer.dart';
+import 'package:milk_farm/isar_manager.dart';
+import 'package:milk_farm/model/customer.dart';
 
-class CustomersWidget extends StatefulWidget {
-  const CustomersWidget({super.key});
+class CustomersWidget extends ConsumerStatefulWidget {
+  final bool selectCustomer;
+  final Function? selectCallback;
+
+  const CustomersWidget(
+      {super.key, this.selectCustomer = false, this.selectCallback});
 
   @override
-  State<CustomersWidget> createState() => _CustomersWidgetState();
+  ConsumerState<CustomersWidget> createState() => _CustomersWidgetState();
 }
 
-class _CustomersWidgetState extends State<CustomersWidget> {
+class _CustomersWidgetState extends ConsumerState<CustomersWidget> {
   final TextEditingController _searchQueryController = TextEditingController();
   bool _isSearching = false;
   String searchQuery = "";
 
-  List<QueryDocumentSnapshot> list = [];
+  List<Customer> list = [];
 
-  List<QueryDocumentSnapshot> filteredList = [];
+  List<Customer> filteredList = [];
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 10), () {
-      FirebaseFirestore.instance.collection('customer').get().then((data) {
-        setState(() {
-          list = data.docs;
-          filteredList = data.docs;
-        });
+    IsarManager.getCustomers().then((value) {
+      setState(() {
+        list = value ?? [];
+        filteredList = value ?? [];
       });
     });
 
@@ -39,7 +43,7 @@ class _CustomersWidgetState extends State<CustomersWidget> {
       } else {
         setState(() {
           filteredList = list
-              .where((data) => data['name']
+              .where((data) => data.name
                   .toString()
                   .toLowerCase()
                   .contains(searchText.toLowerCase()))
@@ -69,84 +73,95 @@ class _CustomersWidgetState extends State<CustomersWidget> {
           itemCount: filteredList.length,
           itemBuilder: (ctx, index) =>
               getCustomerData(filteredList[index], index + 1)),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add_rounded),
-        onPressed: () => {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const AddCustomer()))
-        },
+      floatingActionButton: Visibility(
+        visible: !widget.selectCustomer,
+        child: FloatingActionButton(
+          child: const Icon(Icons.add_rounded),
+          onPressed: () => {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const AddCustomer()))
+          },
+        ),
       ),
     );
   }
 
-  Widget getCustomerData(QueryDocumentSnapshot<Object?>? doc, int index) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(2),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: colors[index % 6],
+  Widget getCustomerData(Customer customer, int index) {
+    return GestureDetector(
+      onTap: (widget.selectCallback != null)
+          ? () {
+              widget.selectCallback?.call(customer);
+              Navigator.pop(context);
+            }
+          : null,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(2),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colors[index % 6],
+                      ),
+                      child: Center(
+                          child: Text(
+                        index.toString(),
+                        style: const TextStyle(color: Colors.white),
+                      )),
                     ),
-                    child: Center(
-                        child: Text(
-                      index.toString(),
-                      style: const TextStyle(color: Colors.white),
-                    )),
                   ),
                 ),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Visibility(
-                    visible: doc?['name'] != null,
-                    child: Text(doc?['name']),
-                  ),
-                  Visibility(
-                    visible: doc?['phoneNumber'] != null,
-                    child: Text(doc?['phoneNumber']),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Visibility(
-            visible: doc?['description'] != null &&
-                doc!['description'].toString().isNotEmpty,
-            child: Text(
-              doc?['description'],
-              maxLines: 3,
+                const SizedBox(
+                  width: 10,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Visibility(
+                      visible: customer.name.isNotEmpty,
+                      child: Text(customer.name),
+                    ),
+                    Visibility(
+                      visible: customer.phoneNumber.isNotEmpty,
+                      child: Text(customer.phoneNumber),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-        ),
-        const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Divider(
-            color: Colors.grey,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Visibility(
+              visible: customer.description.toString().isNotEmpty &&
+                  !widget.selectCustomer,
+              child: Text(
+                customer.description,
+                maxLines: 3,
+              ),
+            ),
           ),
-        )
-      ],
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Divider(
+              color: Colors.grey,
+            ),
+          )
+        ],
+      ),
     );
   }
 

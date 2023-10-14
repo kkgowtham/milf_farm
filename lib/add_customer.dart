@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttercontactpicker/fluttercontactpicker.dart';
 import 'package:milk_farm/model/customer.dart';
+import 'package:milk_farm/remote_manager.dart';
 import 'package:uuid/uuid.dart';
 
 class AddCustomer extends StatefulWidget {
@@ -144,11 +144,7 @@ class _AddCustomerState extends State<AddCustomer> {
     }
     Customer customer = Customer(nameController.text, phoneNumber,
         const Uuid().v1(), descriptionController.text);
-    FirebaseFirestore.instance
-        .collection("customer")
-        .doc(customer.uuId)
-        .set(customer.toJson())
-        .then((data) {
+    RemoteManager.addCustomer(customer).then((data) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("Customer Added")));
     }).catchError((err) {
