@@ -33,13 +33,18 @@ const MilkRecordSchema = CollectionSchema(
       type: IsarType.byte,
       enumMap: _MilkRecordshiftEnumValueMap,
     ),
-    r'totalLitres': PropertySchema(
+    r'timeStamp': PropertySchema(
       id: 3,
+      name: r'timeStamp',
+      type: IsarType.long,
+    ),
+    r'totalLitres': PropertySchema(
+      id: 4,
       name: r'totalLitres',
       type: IsarType.double,
     ),
     r'uuid': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'uuid',
       type: IsarType.string,
     )
@@ -93,8 +98,9 @@ void _milkRecordSerialize(
   writer.writeString(offsets[0], object.date);
   writer.writeString(offsets[1], object.hashId);
   writer.writeByte(offsets[2], object.shift.index);
-  writer.writeDouble(offsets[3], object.totalLitres);
-  writer.writeString(offsets[4], object.uuid);
+  writer.writeLong(offsets[3], object.timeStamp);
+  writer.writeDouble(offsets[4], object.totalLitres);
+  writer.writeString(offsets[5], object.uuid);
 }
 
 MilkRecord _milkRecordDeserialize(
@@ -107,10 +113,11 @@ MilkRecord _milkRecordDeserialize(
     date: reader.readString(offsets[0]),
     shift: _MilkRecordshiftValueEnumMap[reader.readByteOrNull(offsets[2])] ??
         Shift.morning,
-    totalLitres: reader.readDouble(offsets[3]),
-    uuid: reader.readString(offsets[4]),
+    totalLitres: reader.readDouble(offsets[4]),
+    uuid: reader.readString(offsets[5]),
   );
   object.id = id;
+  object.timeStamp = reader.readLong(offsets[3]);
   return object;
 }
 
@@ -129,8 +136,10 @@ P _milkRecordDeserializeProp<P>(
       return (_MilkRecordshiftValueEnumMap[reader.readByteOrNull(offset)] ??
           Shift.morning) as P;
     case 3:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 4:
+      return (reader.readDouble(offset)) as P;
+    case 5:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -704,6 +713,60 @@ extension MilkRecordQueryFilter
     });
   }
 
+  QueryBuilder<MilkRecord, MilkRecord, QAfterFilterCondition> timeStampEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'timeStamp',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MilkRecord, MilkRecord, QAfterFilterCondition>
+      timeStampGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'timeStamp',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MilkRecord, MilkRecord, QAfterFilterCondition> timeStampLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'timeStamp',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MilkRecord, MilkRecord, QAfterFilterCondition> timeStampBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'timeStamp',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<MilkRecord, MilkRecord, QAfterFilterCondition>
       totalLitresEqualTo(
     double value, {
@@ -945,6 +1008,18 @@ extension MilkRecordQuerySortBy
     });
   }
 
+  QueryBuilder<MilkRecord, MilkRecord, QAfterSortBy> sortByTimeStamp() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'timeStamp', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MilkRecord, MilkRecord, QAfterSortBy> sortByTimeStampDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'timeStamp', Sort.desc);
+    });
+  }
+
   QueryBuilder<MilkRecord, MilkRecord, QAfterSortBy> sortByTotalLitres() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'totalLitres', Sort.asc);
@@ -1020,6 +1095,18 @@ extension MilkRecordQuerySortThenBy
     });
   }
 
+  QueryBuilder<MilkRecord, MilkRecord, QAfterSortBy> thenByTimeStamp() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'timeStamp', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MilkRecord, MilkRecord, QAfterSortBy> thenByTimeStampDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'timeStamp', Sort.desc);
+    });
+  }
+
   QueryBuilder<MilkRecord, MilkRecord, QAfterSortBy> thenByTotalLitres() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'totalLitres', Sort.asc);
@@ -1067,6 +1154,12 @@ extension MilkRecordQueryWhereDistinct
     });
   }
 
+  QueryBuilder<MilkRecord, MilkRecord, QDistinct> distinctByTimeStamp() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'timeStamp');
+    });
+  }
+
   QueryBuilder<MilkRecord, MilkRecord, QDistinct> distinctByTotalLitres() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'totalLitres');
@@ -1104,6 +1197,12 @@ extension MilkRecordQueryProperty
   QueryBuilder<MilkRecord, Shift, QQueryOperations> shiftProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'shift');
+    });
+  }
+
+  QueryBuilder<MilkRecord, int, QQueryOperations> timeStampProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'timeStamp');
     });
   }
 

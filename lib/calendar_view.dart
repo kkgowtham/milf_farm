@@ -166,27 +166,27 @@ class _CalendarViewState extends ConsumerState<CalendarView> {
             children: [
               Text(
                 "${DateFormat(' MMMM dd, yyyy').format(date)}$prefix",
-                style: const TextStyle(fontSize: 22,color: Colors.red),
+                style: const TextStyle(fontSize: 22, color: Colors.red),
               ),
-              const SizedBox(height: 20,),
+              const SizedBox(
+                height: 20,
+              ),
               GestureDetector(
                 child: const Text(
                   "View Data for Selected Date",
                   style: TextStyle(fontSize: 18),
                 ),
-                onTap: (){
-                  
-                },
+                onTap: () {},
               ),
-              const SizedBox(height: 20,),
+              const SizedBox(
+                height: 20,
+              ),
               GestureDetector(
                 child: const Text(
                   "Update Data for Selected Date",
                   style: TextStyle(fontSize: 18),
                 ),
-                onTap: (){
-                  
-                },
+                onTap: () {},
               ),
             ],
           ),

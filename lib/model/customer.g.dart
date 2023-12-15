@@ -22,18 +22,34 @@ const CustomerSchema = CollectionSchema(
       name: r'description',
       type: IsarType.string,
     ),
-    r'name': PropertySchema(
+    r'eveningLtrsPref': PropertySchema(
       id: 1,
+      name: r'eveningLtrsPref',
+      type: IsarType.double,
+    ),
+    r'morningLtrsPref': PropertySchema(
+      id: 2,
+      name: r'morningLtrsPref',
+      type: IsarType.double,
+    ),
+    r'name': PropertySchema(
+      id: 3,
       name: r'name',
       type: IsarType.string,
     ),
     r'phoneNumber': PropertySchema(
-      id: 2,
+      id: 4,
       name: r'phoneNumber',
       type: IsarType.string,
     ),
+    r'status': PropertySchema(
+      id: 5,
+      name: r'status',
+      type: IsarType.byte,
+      enumMap: _CustomerstatusEnumValueMap,
+    ),
     r'uuId': PropertySchema(
-      id: 3,
+      id: 6,
       name: r'uuId',
       type: IsarType.string,
     )
@@ -86,9 +102,12 @@ void _customerSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.description);
-  writer.writeString(offsets[1], object.name);
-  writer.writeString(offsets[2], object.phoneNumber);
-  writer.writeString(offsets[3], object.uuId);
+  writer.writeDouble(offsets[1], object.eveningLtrsPref);
+  writer.writeDouble(offsets[2], object.morningLtrsPref);
+  writer.writeString(offsets[3], object.name);
+  writer.writeString(offsets[4], object.phoneNumber);
+  writer.writeByte(offsets[5], object.status.index);
+  writer.writeString(offsets[6], object.uuId);
 }
 
 Customer _customerDeserialize(
@@ -98,10 +117,14 @@ Customer _customerDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Customer(
-    reader.readString(offsets[1]),
-    reader.readString(offsets[2]),
     reader.readString(offsets[3]),
+    reader.readString(offsets[4]),
+    reader.readString(offsets[6]),
     reader.readString(offsets[0]),
+    reader.readDouble(offsets[2]),
+    reader.readDouble(offsets[1]),
+    _CustomerstatusValueEnumMap[reader.readByteOrNull(offsets[5])] ??
+        AccountStatus.active,
   );
   object.id = id;
   return object;
@@ -117,15 +140,31 @@ P _customerDeserializeProp<P>(
     case 0:
       return (reader.readString(offset)) as P;
     case 1:
-      return (reader.readString(offset)) as P;
+      return (reader.readDouble(offset)) as P;
     case 2:
-      return (reader.readString(offset)) as P;
+      return (reader.readDouble(offset)) as P;
     case 3:
+      return (reader.readString(offset)) as P;
+    case 4:
+      return (reader.readString(offset)) as P;
+    case 5:
+      return (_CustomerstatusValueEnumMap[reader.readByteOrNull(offset)] ??
+          AccountStatus.active) as P;
+    case 6:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
 }
+
+const _CustomerstatusEnumValueMap = {
+  'active': 0,
+  'inactive': 1,
+};
+const _CustomerstatusValueEnumMap = {
+  0: AccountStatus.active,
+  1: AccountStatus.inactive,
+};
 
 Id _customerGetId(Customer object) {
   return object.id ?? Isar.autoIncrement;
@@ -446,6 +485,72 @@ extension CustomerQueryFilter
     });
   }
 
+  QueryBuilder<Customer, Customer, QAfterFilterCondition>
+      eveningLtrsPrefEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'eveningLtrsPref',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterFilterCondition>
+      eveningLtrsPrefGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'eveningLtrsPref',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterFilterCondition>
+      eveningLtrsPrefLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'eveningLtrsPref',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterFilterCondition>
+      eveningLtrsPrefBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'eveningLtrsPref',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
   QueryBuilder<Customer, Customer, QAfterFilterCondition> idIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -510,6 +615,72 @@ extension CustomerQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterFilterCondition>
+      morningLtrsPrefEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'morningLtrsPref',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterFilterCondition>
+      morningLtrsPrefGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'morningLtrsPref',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterFilterCondition>
+      morningLtrsPrefLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'morningLtrsPref',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterFilterCondition>
+      morningLtrsPrefBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'morningLtrsPref',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
       ));
     });
   }
@@ -776,6 +947,59 @@ extension CustomerQueryFilter
     });
   }
 
+  QueryBuilder<Customer, Customer, QAfterFilterCondition> statusEqualTo(
+      AccountStatus value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'status',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterFilterCondition> statusGreaterThan(
+    AccountStatus value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'status',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterFilterCondition> statusLessThan(
+    AccountStatus value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'status',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterFilterCondition> statusBetween(
+    AccountStatus lower,
+    AccountStatus upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'status',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Customer, Customer, QAfterFilterCondition> uuIdEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -926,6 +1150,30 @@ extension CustomerQuerySortBy on QueryBuilder<Customer, Customer, QSortBy> {
     });
   }
 
+  QueryBuilder<Customer, Customer, QAfterSortBy> sortByEveningLtrsPref() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'eveningLtrsPref', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterSortBy> sortByEveningLtrsPrefDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'eveningLtrsPref', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterSortBy> sortByMorningLtrsPref() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'morningLtrsPref', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterSortBy> sortByMorningLtrsPrefDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'morningLtrsPref', Sort.desc);
+    });
+  }
+
   QueryBuilder<Customer, Customer, QAfterSortBy> sortByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -947,6 +1195,18 @@ extension CustomerQuerySortBy on QueryBuilder<Customer, Customer, QSortBy> {
   QueryBuilder<Customer, Customer, QAfterSortBy> sortByPhoneNumberDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'phoneNumber', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterSortBy> sortByStatus() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'status', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterSortBy> sortByStatusDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'status', Sort.desc);
     });
   }
 
@@ -977,6 +1237,18 @@ extension CustomerQuerySortThenBy
     });
   }
 
+  QueryBuilder<Customer, Customer, QAfterSortBy> thenByEveningLtrsPref() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'eveningLtrsPref', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterSortBy> thenByEveningLtrsPrefDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'eveningLtrsPref', Sort.desc);
+    });
+  }
+
   QueryBuilder<Customer, Customer, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -986,6 +1258,18 @@ extension CustomerQuerySortThenBy
   QueryBuilder<Customer, Customer, QAfterSortBy> thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterSortBy> thenByMorningLtrsPref() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'morningLtrsPref', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterSortBy> thenByMorningLtrsPrefDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'morningLtrsPref', Sort.desc);
     });
   }
 
@@ -1013,6 +1297,18 @@ extension CustomerQuerySortThenBy
     });
   }
 
+  QueryBuilder<Customer, Customer, QAfterSortBy> thenByStatus() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'status', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QAfterSortBy> thenByStatusDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'status', Sort.desc);
+    });
+  }
+
   QueryBuilder<Customer, Customer, QAfterSortBy> thenByUuId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'uuId', Sort.asc);
@@ -1035,6 +1331,18 @@ extension CustomerQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Customer, Customer, QDistinct> distinctByEveningLtrsPref() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'eveningLtrsPref');
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QDistinct> distinctByMorningLtrsPref() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'morningLtrsPref');
+    });
+  }
+
   QueryBuilder<Customer, Customer, QDistinct> distinctByName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1046,6 +1354,12 @@ extension CustomerQueryWhereDistinct
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'phoneNumber', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Customer, Customer, QDistinct> distinctByStatus() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'status');
     });
   }
 
@@ -1071,6 +1385,18 @@ extension CustomerQueryProperty
     });
   }
 
+  QueryBuilder<Customer, double, QQueryOperations> eveningLtrsPrefProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'eveningLtrsPref');
+    });
+  }
+
+  QueryBuilder<Customer, double, QQueryOperations> morningLtrsPrefProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'morningLtrsPref');
+    });
+  }
+
   QueryBuilder<Customer, String, QQueryOperations> nameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'name');
@@ -1080,6 +1406,12 @@ extension CustomerQueryProperty
   QueryBuilder<Customer, String, QQueryOperations> phoneNumberProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'phoneNumber');
+    });
+  }
+
+  QueryBuilder<Customer, AccountStatus, QQueryOperations> statusProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'status');
     });
   }
 

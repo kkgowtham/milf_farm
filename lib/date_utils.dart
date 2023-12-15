@@ -160,7 +160,7 @@ bool isSameMonth(DateTime d1, DateTime d2) {
   return d1.month == d2.month && d1.year == d2.year;
 }
 
-bool isSaturdayOrSunday(DateTime date){
+bool isSaturdayOrSunday(DateTime date) {
   return date.weekday == DateTime.sunday || date.weekday == DateTime.saturday;
 }
 
@@ -201,4 +201,8 @@ extension DateUtils on DateTime {
   String get isoFormat {
     return DateFormat('yyyy-MM-dd').format(this);
   }
+}
+
+DateTime getDateFromString(String date) {
+  return _apiDayFormat.parse(date);
 }

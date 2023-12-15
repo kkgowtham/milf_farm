@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:isar/isar.dart';
 import 'package:milk_farm/model/customer.dart';
 import 'package:milk_farm/model/milk_data.dart';
@@ -8,8 +7,8 @@ class IsarManager {
 
   IsarManager();
 
-  static void addCustomer(Customer customer) async {
-    await isar?.writeTxn(() async {
+  static Future addCustomer(Customer customer) async {
+    return await isar?.writeTxn(() async {
       isar?.customers.put(customer);
     });
   }
@@ -68,7 +67,30 @@ class IsarManager {
     });
   }
 
-  static Future<Id>? addOrUpdateMilkRecord(MilkRecord record){
+  static Future<Id>? addOrUpdateMilkRecord(MilkRecord record) {
     return isar?.milkRecords.put(record);
+  }
+
+  static double getTotalLitres(String date) {
+    double totalLitres = 0;
+    for (var element
+        in (isar?.milkRecords.filter().dateEqualTo(date).findAllSync() ?? [])) {
+      totalLitres += element.totalLitres;
+    }
+    return totalLitres;
+  }
+
+  static double getTotalLitresForShift(String date, Shift shift) {
+    double totalLitres = 0;
+    for (var element in getMilkRecords(date, shift)) {
+      totalLitres += element.totalLitres;
+    }
+    return totalLitres;
+  }
+
+  static void addOrUpdateMilkRecords(List<MilkRecord> records) {
+    isar?.writeTxn(() async {
+      return isar?.milkRecords.putAll(records);
+    });
   }
 }

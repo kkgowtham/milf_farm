@@ -1,13 +1,12 @@
 import 'package:flutter/cupertino.dart' show CupertinoSegmentedControl;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:milk_farm/date_utils.dart';
 import 'package:milk_farm/extensions.dart';
 import 'package:milk_farm/isar_manager.dart';
-import 'package:milk_farm/date_utils.dart';
 import 'package:milk_farm/model/customer.dart';
 import 'package:milk_farm/model/milk_data.dart';
 import 'package:milk_farm/model/state/page_state.dart';
-import 'package:milk_farm/remote_manager.dart';
 import 'package:milk_farm/state/page_state_provider.dart';
 
 class DayDetailsWidget extends ConsumerStatefulWidget {
@@ -29,7 +28,7 @@ class _DayDetailsWidgetState extends ConsumerState<DayDetailsWidget> {
 
   @override
   Widget build(BuildContext context) {
-   final state = ref.watch(pageStateProvider(widget.dateTime.isoFormat));
+    final state = ref.watch(pageStateProvider(widget.dateTime.isoFormat));
     return Stack(children: [
       Column(
         children: [
@@ -39,7 +38,9 @@ class _DayDetailsWidgetState extends ConsumerState<DayDetailsWidget> {
             color: Colors.white,
             strokeWidth: 3,
             onRefresh: () {
-              return ref.watch(pageStateProvider(widget.dateTime.isoFormat).notifier).refreshRemoteData();
+              return ref
+                  .watch(pageStateProvider(widget.dateTime.isoFormat).notifier)
+                  .refreshRemoteData();
             },
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -62,9 +63,12 @@ class _DayDetailsWidgetState extends ConsumerState<DayDetailsWidget> {
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
-                          getData("Total Litres", "1"),
-                          getData("Morning", "1"),
-                          getData("Evening", "1"),
+                          getData("Total Litres",
+                              state.getTotalLitres().toString()),
+                          getData(
+                              "Morning", state.getMorningLitres().toString()),
+                          getData(
+                              "Evening", state.getEveningLitres().toString()),
                         ],
                       ),
                     ),
@@ -80,7 +84,11 @@ class _DayDetailsWidgetState extends ConsumerState<DayDetailsWidget> {
                       groupValue: state.shift,
                       onValueChanged: (data) {
                         setState(() {
-                          ref.watch(pageStateProvider(widget.dateTime.isoFormat).notifier).onShiftChanged(data);
+                          ref
+                              .watch(
+                                  pageStateProvider(widget.dateTime.isoFormat)
+                                      .notifier)
+                              .onShiftChanged(data);
                         });
                       }),
                   const SizedBox(
@@ -131,14 +139,17 @@ class _DayDetailsWidgetState extends ConsumerState<DayDetailsWidget> {
   Widget getDataColumn(PageState state) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: DataTable(columns: const [
-        DataColumn(
-          label: Text('Name'),
-        ),
-        DataColumn(
-          label: Text('Litres'),
-        ),
-      ], rows: state.records.map((e) => getRowData(e)).toList()),
+      child: DataTable(
+          showCheckboxColumn: false,
+          columns: const [
+            DataColumn(
+              label: Text('Name'),
+            ),
+            DataColumn(
+              label: Text('Litres'),
+            ),
+          ],
+          rows: state.records.map((e) => getRowData(e)).toList()),
     );
   }
 
@@ -178,9 +189,13 @@ class _DayDetailsWidgetState extends ConsumerState<DayDetailsWidget> {
                                         horizontal: 18.0),
                                     child: TextButton(
                                         onPressed: () async {
-                                          ref.watch(pageStateProvider(widget.dateTime.isoFormat).notifier).updateMilkRecord(
-                                              record, quantities[itemSelection],
-                                              (status) {
+                                          ref
+                                              .watch(pageStateProvider(
+                                                      widget.dateTime.isoFormat)
+                                                  .notifier)
+                                              .updateMilkRecord(record,
+                                                  quantities[itemSelection],
+                                                  (status) {
                                             if (!mounted) return;
                                             context.pop();
                                             if (status) {
@@ -223,7 +238,6 @@ class _DayDetailsWidgetState extends ConsumerState<DayDetailsWidget> {
                                     }),
                                     checkmarkColor: Colors.white,
                                     onSelected: (bool selected) {
-                                      debugPrint(index.toString());
                                       setState(() {
                                         itemSelection = index;
                                       });

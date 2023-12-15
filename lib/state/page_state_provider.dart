@@ -4,6 +4,7 @@ import 'package:milk_farm/isar_manager.dart';
 import 'package:milk_farm/model/milk_data.dart';
 import 'package:milk_farm/model/state/page_state.dart';
 import 'package:milk_farm/remote_manager.dart';
+import 'package:milk_farm/supabase_helper.dart';
 
 class PageStateProvider extends StateNotifier<PageState> {
   PageStateProvider(String date)
@@ -30,16 +31,16 @@ class PageStateProvider extends StateNotifier<PageState> {
       MilkRecord record, double totalLitres, Function callback) async {
     record.totalLitres = totalLitres;
     try {
-      await RemoteManager.addOrUpdateMilkRecord(record);
+      record.timeStamp = DateTime.now().millisecondsSinceEpoch;
+      await SupabaseHelper.addOrUpdateMilkRecord(record);
       await IsarManager.isar?.writeTxn(() async {
         final data = await IsarManager.addOrUpdateMilkRecord(record);
         debugPrint(data.toString());
       });
       callback.call(true);
       refreshData();
-
-    } catch (e,st) {
-      debugPrintStack(label: e.toString(),stackTrace: st);
+    } catch (e, st) {
+      debugPrintStack(label: e.toString(), stackTrace: st);
       callback.call(false);
       refreshData();
     }
@@ -52,16 +53,15 @@ class PageStateProvider extends StateNotifier<PageState> {
   void refreshData() {
     final refreshedRecords = getMilkRecords(state.date, state.shift);
     state = state.copyWith(records: refreshedRecords);
-
   }
 
   Future refreshRemoteData() async {
     try {
       final result = await IsarManager.isar?.writeTxn(() async {
-        final data = await RemoteManager.getMilkRecords(state.date);
-        for (var element in data.docs) {
-          IsarManager.addOrUpdateMilkRecord(
-              MilkRecord.fromJson(element.data()));
+        final data = await SupabaseHelper.getRecordsForDate(state.date);
+        for (var milkData in data) {
+          milkData.timeStamp = DateTime.now().millisecondsSinceEpoch;
+          IsarManager.addOrUpdateMilkRecord(milkData);
         }
       });
       refreshData();

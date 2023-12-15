@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-extension ContextExt on BuildContext{
-
+extension ContextExt on BuildContext {
   get height {
     return MediaQuery.of(this).size.height;
   }
@@ -10,14 +9,13 @@ extension ContextExt on BuildContext{
     return MediaQuery.of(this).size.width;
   }
 
-  void showSnackBar(String text){
+  void showSnackBar(String text) {
     ScaffoldMessenger.of(this).showSnackBar(SnackBar(
       content: Text(text),
     ));
   }
 
-  void pop(){
+  void pop() {
     Navigator.pop(this);
   }
 }
-

@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 
 class UpdateDataScreen extends StatefulWidget {
@@ -15,9 +13,7 @@ class _UpdateDataScreenState extends State<UpdateDataScreen> {
     return Scaffold(
       appBar: AppBar(),
       body: const Column(
-        children: [
-
-        ],
+        children: [],
       ),
     );
   }

@@ -8,11 +8,11 @@ class PrefManager {
 
   Future<String?> getString(String key) async {
     var box = await Hive.openBox('settings');
-    return box.get(key,defaultValue: null);
+    return box.get(key, defaultValue: null);
   }
 
   Future<int> getInt(String key) async {
     var box = await Hive.openBox('settings');
-    return box.get(key,defaultValue: -1);
+    return box.get(key, defaultValue: -1);
   }
 }

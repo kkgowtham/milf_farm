@@ -1,16 +1,22 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:milk_farm/data_screen.dart';
 import 'package:milk_farm/isar_manager.dart';
 import 'package:milk_farm/customers.dart';
 import 'package:milk_farm/home_screen.dart';
 import 'package:milk_farm/remote_manager.dart';
 import 'package:milk_farm/state.dart';
-
+import 'package:milk_farm/supabase_helper.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await Supabase.initialize(
+    url: supabaseUrl,
+    anonKey: supabaseKey,
+  );
   IsarManager.isar = await getCustomerIsar();
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -47,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    RemoteManager.fetchAndUpdateCustomers();
+    SupabaseHelper.fetchAndUpdateCustomers();
   }
 
   @override
@@ -66,7 +72,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   MaterialPageRoute(
                       builder: (context) => const CustomersWidget()));
             },
-          )
+          ),
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const FilterDataScreen()));
+              },
+              icon: const Icon(Icons.insert_chart))
         ],
       ),
       body: const Center(
@@ -81,3 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+const supabaseUrl = 'https://difwrxwdynxqycjcjsgm.supabase.co';
+const supabaseKey =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpZndyeHdkeW54cXljamNqc2dtIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTc4Njk2NzMsImV4cCI6MjAxMzQ0NTY3M30.d7P1HjJe5uee_UqQzOTo70P1WFeajFxQAilSk1dTmzI';

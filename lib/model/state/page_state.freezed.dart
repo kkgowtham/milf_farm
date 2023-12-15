@@ -75,10 +75,11 @@ class _$PageStateCopyWithImpl<$Res, $Val extends PageState>
 }
 
 /// @nodoc
-abstract class _$$_PageStateCopyWith<$Res> implements $PageStateCopyWith<$Res> {
-  factory _$$_PageStateCopyWith(
-          _$_PageState value, $Res Function(_$_PageState) then) =
-      __$$_PageStateCopyWithImpl<$Res>;
+abstract class _$$PageStateImplCopyWith<$Res>
+    implements $PageStateCopyWith<$Res> {
+  factory _$$PageStateImplCopyWith(
+          _$PageStateImpl value, $Res Function(_$PageStateImpl) then) =
+      __$$PageStateImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -86,11 +87,11 @@ abstract class _$$_PageStateCopyWith<$Res> implements $PageStateCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$_PageStateCopyWithImpl<$Res>
-    extends _$PageStateCopyWithImpl<$Res, _$_PageState>
-    implements _$$_PageStateCopyWith<$Res> {
-  __$$_PageStateCopyWithImpl(
-      _$_PageState _value, $Res Function(_$_PageState) _then)
+class __$$PageStateImplCopyWithImpl<$Res>
+    extends _$PageStateCopyWithImpl<$Res, _$PageStateImpl>
+    implements _$$PageStateImplCopyWith<$Res> {
+  __$$PageStateImplCopyWithImpl(
+      _$PageStateImpl _value, $Res Function(_$PageStateImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -101,7 +102,7 @@ class __$$_PageStateCopyWithImpl<$Res>
     Object? records = null,
     Object? isLoading = null,
   }) {
-    return _then(_$_PageState(
+    return _then(_$PageStateImpl(
       date: null == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
@@ -124,13 +125,14 @@ class __$$_PageStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_PageState implements _PageState {
-  const _$_PageState(
+class _$PageStateImpl extends _PageState {
+  const _$PageStateImpl(
       {required this.date,
       required this.shift,
       required final List<MilkRecord> records,
       required this.isLoading})
-      : _records = records;
+      : _records = records,
+        super._();
 
   @override
   final String date;
@@ -156,7 +158,7 @@ class _$_PageState implements _PageState {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_PageState &&
+            other is _$PageStateImpl &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.shift, shift) || other.shift == shift) &&
             const DeepCollectionEquality().equals(other._records, _records) &&
@@ -171,16 +173,17 @@ class _$_PageState implements _PageState {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_PageStateCopyWith<_$_PageState> get copyWith =>
-      __$$_PageStateCopyWithImpl<_$_PageState>(this, _$identity);
+  _$$PageStateImplCopyWith<_$PageStateImpl> get copyWith =>
+      __$$PageStateImplCopyWithImpl<_$PageStateImpl>(this, _$identity);
 }
 
-abstract class _PageState implements PageState {
+abstract class _PageState extends PageState {
   const factory _PageState(
       {required final String date,
       required final Shift shift,
       required final List<MilkRecord> records,
-      required final bool isLoading}) = _$_PageState;
+      required final bool isLoading}) = _$PageStateImpl;
+  const _PageState._() : super._();
 
   @override
   String get date;
@@ -192,6 +195,6 @@ abstract class _PageState implements PageState {
   bool get isLoading;
   @override
   @JsonKey(ignore: true)
-  _$$_PageStateCopyWith<_$_PageState> get copyWith =>
+  _$$PageStateImplCopyWith<_$PageStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

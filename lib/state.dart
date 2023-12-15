@@ -5,7 +5,6 @@ import 'package:path_provider/path_provider.dart';
 
 Future<Isar> getCustomerIsar() async {
   final dir = await getApplicationDocumentsDirectory();
-  return Isar.open([CustomerSchema,MilkRecordSchema], directory: dir.path,inspector: true);
+  return Isar.open([CustomerSchema, MilkRecordSchema],
+      directory: dir.path, inspector: true);
 }
-
-
