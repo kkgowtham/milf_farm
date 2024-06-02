@@ -125,10 +125,11 @@ class _CustomersWidgetState extends ConsumerState<CustomersWidget> {
               },
               child: (filteredList.isEmpty)
                   ? const Center(
-                child: Text("No Data Found ...",style: TextStyle(
-                  fontSize: 18
-                ),),
-              )
+                      child: Text(
+                        "No Data Found ...",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    )
                   : SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
                       child: ListView.builder(
@@ -147,8 +148,8 @@ class _CustomersWidgetState extends ConsumerState<CustomersWidget> {
         child: FloatingActionButton(
           child: const Icon(Icons.add_rounded),
           onPressed: () => {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => const AddCustomer()))
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const AddCustomer()))
           },
         ),
       ),

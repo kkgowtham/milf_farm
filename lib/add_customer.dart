@@ -239,14 +239,15 @@ class _AddCustomerState extends State<AddCustomer> {
           content: Text((isUpdateUserFlow)
               ? "Customer Updated"
               : "Customer Added")));
+      if(!isUpdateUserFlow) {
+        _clearValues();
+      }
     }).catchError((err,stackTrace) {
-      debugPrintStack(stackTrace: stackTrace,label: err);
+      print(err.toString());
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Error Occured")));
+          .showSnackBar(const SnackBar(content: Text("Error Occurred")));
     });
-    if(!isUpdateUserFlow) {
-      _clearValues();
-    }
+
   }
 
   void _clearValues() {

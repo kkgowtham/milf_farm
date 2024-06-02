@@ -19,6 +19,7 @@ mixin _$PageState {
   String get date => throw _privateConstructorUsedError;
   Shift get shift => throw _privateConstructorUsedError;
   List<MilkRecord> get records => throw _privateConstructorUsedError;
+  List<MilkRecord> get preferenceRecords => throw _privateConstructorUsedError;
   bool get isLoading => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -32,7 +33,11 @@ abstract class $PageStateCopyWith<$Res> {
       _$PageStateCopyWithImpl<$Res, PageState>;
   @useResult
   $Res call(
-      {String date, Shift shift, List<MilkRecord> records, bool isLoading});
+      {String date,
+      Shift shift,
+      List<MilkRecord> records,
+      List<MilkRecord> preferenceRecords,
+      bool isLoading});
 }
 
 /// @nodoc
@@ -51,6 +56,7 @@ class _$PageStateCopyWithImpl<$Res, $Val extends PageState>
     Object? date = null,
     Object? shift = null,
     Object? records = null,
+    Object? preferenceRecords = null,
     Object? isLoading = null,
   }) {
     return _then(_value.copyWith(
@@ -65,6 +71,10 @@ class _$PageStateCopyWithImpl<$Res, $Val extends PageState>
       records: null == records
           ? _value.records
           : records // ignore: cast_nullable_to_non_nullable
+              as List<MilkRecord>,
+      preferenceRecords: null == preferenceRecords
+          ? _value.preferenceRecords
+          : preferenceRecords // ignore: cast_nullable_to_non_nullable
               as List<MilkRecord>,
       isLoading: null == isLoading
           ? _value.isLoading
@@ -83,7 +93,11 @@ abstract class _$$PageStateImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String date, Shift shift, List<MilkRecord> records, bool isLoading});
+      {String date,
+      Shift shift,
+      List<MilkRecord> records,
+      List<MilkRecord> preferenceRecords,
+      bool isLoading});
 }
 
 /// @nodoc
@@ -100,6 +114,7 @@ class __$$PageStateImplCopyWithImpl<$Res>
     Object? date = null,
     Object? shift = null,
     Object? records = null,
+    Object? preferenceRecords = null,
     Object? isLoading = null,
   }) {
     return _then(_$PageStateImpl(
@@ -114,6 +129,10 @@ class __$$PageStateImplCopyWithImpl<$Res>
       records: null == records
           ? _value._records
           : records // ignore: cast_nullable_to_non_nullable
+              as List<MilkRecord>,
+      preferenceRecords: null == preferenceRecords
+          ? _value._preferenceRecords
+          : preferenceRecords // ignore: cast_nullable_to_non_nullable
               as List<MilkRecord>,
       isLoading: null == isLoading
           ? _value.isLoading
@@ -130,8 +149,10 @@ class _$PageStateImpl extends _PageState {
       {required this.date,
       required this.shift,
       required final List<MilkRecord> records,
+      required final List<MilkRecord> preferenceRecords,
       required this.isLoading})
       : _records = records,
+        _preferenceRecords = preferenceRecords,
         super._();
 
   @override
@@ -146,12 +167,21 @@ class _$PageStateImpl extends _PageState {
     return EqualUnmodifiableListView(_records);
   }
 
+  final List<MilkRecord> _preferenceRecords;
+  @override
+  List<MilkRecord> get preferenceRecords {
+    if (_preferenceRecords is EqualUnmodifiableListView)
+      return _preferenceRecords;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_preferenceRecords);
+  }
+
   @override
   final bool isLoading;
 
   @override
   String toString() {
-    return 'PageState(date: $date, shift: $shift, records: $records, isLoading: $isLoading)';
+    return 'PageState(date: $date, shift: $shift, records: $records, preferenceRecords: $preferenceRecords, isLoading: $isLoading)';
   }
 
   @override
@@ -162,13 +192,20 @@ class _$PageStateImpl extends _PageState {
             (identical(other.date, date) || other.date == date) &&
             (identical(other.shift, shift) || other.shift == shift) &&
             const DeepCollectionEquality().equals(other._records, _records) &&
+            const DeepCollectionEquality()
+                .equals(other._preferenceRecords, _preferenceRecords) &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, date, shift,
-      const DeepCollectionEquality().hash(_records), isLoading);
+  int get hashCode => Object.hash(
+      runtimeType,
+      date,
+      shift,
+      const DeepCollectionEquality().hash(_records),
+      const DeepCollectionEquality().hash(_preferenceRecords),
+      isLoading);
 
   @JsonKey(ignore: true)
   @override
@@ -182,6 +219,7 @@ abstract class _PageState extends PageState {
       {required final String date,
       required final Shift shift,
       required final List<MilkRecord> records,
+      required final List<MilkRecord> preferenceRecords,
       required final bool isLoading}) = _$PageStateImpl;
   const _PageState._() : super._();
 
@@ -191,6 +229,8 @@ abstract class _PageState extends PageState {
   Shift get shift;
   @override
   List<MilkRecord> get records;
+  @override
+  List<MilkRecord> get preferenceRecords;
   @override
   bool get isLoading;
   @override

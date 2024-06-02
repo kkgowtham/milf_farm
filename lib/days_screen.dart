@@ -6,7 +6,6 @@ import 'package:milk_farm/extensions.dart';
 import 'package:milk_farm/isar_manager.dart';
 import 'package:milk_farm/model/customer.dart';
 import 'package:milk_farm/model/milk_data.dart';
-import 'package:milk_farm/model/state/page_state.dart';
 import 'package:milk_farm/state/page_state_provider.dart';
 
 class DayDetailsWidget extends ConsumerStatefulWidget {
@@ -30,140 +29,254 @@ class _DayDetailsWidgetState extends ConsumerState<DayDetailsWidget> {
   Widget build(BuildContext context) {
     final state = ref.watch(pageStateProvider(widget.dateTime.isoFormat));
     return Stack(children: [
-      Column(
-        children: [
-          RefreshIndicator(
-            displacement: 100,
-            backgroundColor: Colors.purple,
-            color: Colors.white,
-            strokeWidth: 3,
-            onRefresh: () {
-              return ref
-                  .watch(pageStateProvider(widget.dateTime.isoFormat).notifier)
-                  .refreshRemoteData();
-            },
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    widget.dateTime.displayFormat,
-                    style: const TextStyle(color: Colors.black, fontSize: 20),
-                  ),
-                  const Divider(),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const Text("Milk Data"),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          getData("Total Litres",
-                              state.getTotalLitres().toString()),
-                          getData(
-                              "Morning", state.getMorningLitres().toString()),
-                          getData(
-                              "Evening", state.getEveningLitres().toString()),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  CupertinoSegmentedControl(
-                      children: {
-                        Shift.morning: getSegmentControlWidget("Morning"),
-                        Shift.evening: getSegmentControlWidget("Evening")
-                      },
-                      groupValue: state.shift,
-                      onValueChanged: (data) {
-                        setState(() {
-                          ref
-                              .watch(
-                                  pageStateProvider(widget.dateTime.isoFormat)
-                                      .notifier)
-                              .onShiftChanged(data);
-                        });
-                      }),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  getDataColumn(state),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                ],
+      RefreshIndicator(
+        displacement: 100,
+        backgroundColor: Colors.purple,
+        color: Colors.white,
+        strokeWidth: 3,
+        onRefresh: () {
+          return ref
+              .watch(pageStateProvider(widget.dateTime.isoFormat).notifier)
+              .refreshRemoteData();
+        },
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 10,
               ),
-            ),
-          )
-        ],
-      ),
-      Positioned(
-        right: 20,
-        bottom: 20,
-        child: FloatingActionButton(
-          onPressed: () {
-/*
-            IsarManager.getAllMilkRecords(
-                    widget.dateTime.isoFormat, Shift.values[groupValue])
-                .forEach((element) {
-            });
-*/
-
-            /*
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => CustomersWidget(
-                      selectCustomer: true,
-                      selectCallback: (Customer customer) {
-                        Future.delayed(const Duration(milliseconds: 100),
-                            () async {
-                          await showDialog(
-                            context: context,
-                            builder: (_) => Text(customer.name),
-                          );
-                        });
-                      },
-                    )));*/
-          },
+              Text(
+                widget.dateTime.displayFormat,
+                style: const TextStyle(color: Colors.black, fontSize: 20),
+              ),
+              const Divider(),
+              const SizedBox(
+                height: 10,
+              ),
+              const Text("Milk Data"),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      getData(
+                          "Total Litres", state.getTotalLitres().toString()),
+                      getData("Morning", state.getMorningLitres().toString()),
+                      getData("Evening", state.getEveningLitres().toString()),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: CupertinoSegmentedControl(
+                    children: {
+                      Shift.morning: getSegmentControlWidget("Morning"),
+                      Shift.evening: getSegmentControlWidget("Evening")
+                    },
+                    groupValue: state.shift,
+                    onValueChanged: (data) {
+                      setState(() {
+                        ref
+                            .watch(pageStateProvider(widget.dateTime.isoFormat)
+                                .notifier)
+                            .onShiftChanged(data);
+                      });
+                    }),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              getDataColumn(state.records,context),
+              const SizedBox(
+                height: 10,
+              ),
+              getDataColumn(state.preferenceRecords,context, isNewRecord: true),
+              const SizedBox(
+                height: 10,
+              ),
+            ],
+          ),
         ),
       )
     ]);
   }
 
-  Widget getDataColumn(PageState state) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-          showCheckboxColumn: false,
-          columns: const [
-            DataColumn(
-              label: Text('Name'),
-            ),
-            DataColumn(
-              label: Text('Litres'),
-            ),
-          ],
-          rows: state.records.map((e) => getRowData(e)).toList()),
+  Widget getDataColumn(List<MilkRecord> list,BuildContext context, {bool isNewRecord = false}) {
+    return IgnorePointer(
+      ignoring: list.isEmpty,
+      child: ExpansionTile(
+        title: Text(
+          isNewRecord ? "Customers" : "Milk Records",
+          style: const TextStyle(
+            color: Colors.deepPurpleAccent,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        initiallyExpanded: true,
+        shape: const Border(),
+        children: [
+          (list.isEmpty)
+              ? const Text("No Data Found")
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      if (isNewRecord) {
+                        return getHeaderRow("Name", "Preference(Ltrs)");
+                      } else {
+                        return getHeaderRow("Name", "Litres");
+                      }
+                    }
+                    return getRowData(list[index - 1], isNewRecord, index - 1,context);
+                  },
+                  itemCount: list.length + 1,
+                )
+        ],
+      ),
     );
   }
 
-  DataRow getRowData(MilkRecord record) {
+  Widget getHeaderRow(String value1, String value2) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Flexible(
+            child: FractionallySizedBox(
+                widthFactor: 0.5,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Text(
+                      value1,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ))),
+        Flexible(
+          child: FractionallySizedBox(
+            widthFactor: 1,
+            child: Center(
+              child: Text(
+                value2,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget getRowItem(MilkRecord record, bool isNewRecord, int index,BuildContext context) {
     final Customer? customer = IsarManager.getCustomerById(record.uuid);
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Flexible(
+                child: FractionallySizedBox(
+                    widthFactor: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: Text(
+                          "${customer?.name}",
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.normal),
+                        ),
+                      ),
+                    ))),
+            Flexible(
+              child: FractionallySizedBox(
+                widthFactor: 1,
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Text(
+                    record.totalLitres.toString(),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.normal),
+                  ),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                if (!isNewRecord) {
+                  _showYesNoDialog(context, () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        });
+                    ref
+                        .watch(pageStateProvider(widget.dateTime.isoFormat)
+                            .notifier)
+                        .deleteMilkRecord(record, (data) {
+                      Navigator.of(context).pop();
+                    });
+                  });
+                  return;
+                }
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    });
+
+                ref
+                    .watch(
+                        pageStateProvider(widget.dateTime.isoFormat).notifier)
+                    .addMilkRecord(record, (data) {
+                  Navigator.of(context).pop();
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.black54, // Set your desired stroke color
+                      width: 2.0, // Set your desired stroke width
+                    ),
+                  ),
+                  child: Icon(
+                    (isNewRecord) ? Icons.add : Icons.remove,
+                    size: 24.0,
+                    color: Colors.black54, // Set your desired icon color
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const Divider()
+      ],
+    );
+  }
+
+  Widget getRowData(MilkRecord record, bool isNewRecord, int i,BuildContext context) {
     int itemSelection = !quantities.contains(record.totalLitres)
         ? 0
         : quantities.indexOf(record.totalLitres);
-    return DataRow(
-      cells: [
-        DataCell(Text(customer?.name ?? "")),
-        DataCell(Text(record.totalLitres.toString())),
-      ],
-      onSelectChanged: (value) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      child: getRowItem(record, isNewRecord, i,context),
+      onTap: () {
         showModalBottomSheet<void>(
           context: context,
           isScrollControlled: true,
@@ -285,4 +398,34 @@ class _DayDetailsWidgetState extends ConsumerState<DayDetailsWidget> {
       ),
     );
   }
+}
+
+Future<void> _showYesNoDialog(
+    BuildContext context, Function onYesPressed) async {
+  return showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Confirmation'),
+        content: const Text('Do you want to proceed?'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Dismiss the dialog
+              // Perform actions for "No" if needed
+            },
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Dismiss the dialog
+              // Call the callback for "Yes"
+              onYesPressed();
+            },
+            child: const Text('Yes'),
+          ),
+        ],
+      );
+    },
+  );
 }

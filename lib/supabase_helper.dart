@@ -15,6 +15,13 @@ class SupabaseHelper {
     return result;
   }
 
+  static Future<dynamic> deleteMilkRecord(MilkRecord record) async {
+    final result = await Supabase.instance.client
+        .from('milk_records')
+        .delete().match({'hashId':record.hashId});
+    return result;
+  }
+
   static Future addCustomer(Customer customer) async {
     final result = await Supabase.instance.client
         .from('customers')

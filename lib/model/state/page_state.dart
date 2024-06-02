@@ -10,6 +10,7 @@ class PageState with _$PageState {
       {required String date,
       required Shift shift,
       required List<MilkRecord> records,
+      required List<MilkRecord> preferenceRecords,
       required bool isLoading}) = _PageState;
 
   const PageState._();

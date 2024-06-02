@@ -61,6 +61,30 @@ class IsarManager {
     return list;
   }
 
+  static List<MilkRecord> getMilkRecordsData(String date, Shift shift) {
+    return isar?.milkRecords
+            .filter()
+            .dateEqualTo(date)
+            .and()
+            .shiftEqualTo(shift)
+            .findAllSync() ??
+        [];
+  }
+
+  static List<MilkRecord> getPreferenceMilkRecords(String date, Shift shift) {
+    final uuids = getMilkRecords(date, shift).map((e) => e.uuid);
+    return getCustomersSync()
+        .where((element) => !uuids.contains(element.uuId))
+        .map((e) => MilkRecord(
+            uuid: e.uuId,
+            shift: shift,
+            date: date,
+            totalLitres: (shift == Shift.evening)
+                ? e.eveningLtrsPref
+                : e.morningLtrsPref))
+        .toList();
+  }
+
   static void addOrUpdateRecord(MilkRecord record) {
     isar?.writeTxn(() async {
       isar?.milkRecords.put(record);
@@ -69,6 +93,10 @@ class IsarManager {
 
   static Future<Id>? addOrUpdateMilkRecord(MilkRecord record) {
     return isar?.milkRecords.put(record);
+  }
+
+  static Future<bool>? deleteMilkRecord(MilkRecord record) {
+    return isar?.milkRecords.deleteByHashId(record.hashId);
   }
 
   static double getTotalLitres(String date) {

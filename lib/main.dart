@@ -88,7 +88,6 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             DayWiseWidget()
-            //CalendarView(_scaffoldKey)
           ],
         ),
       ), // This trailing comma makes auto-formatting nicer for build methods.

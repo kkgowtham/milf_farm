@@ -1,13 +1,14 @@
-import 'package:flutter/cupertino.dart';
+import "package:collection/collection.dart";
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:milk_farm/customers.dart';
 import 'package:milk_farm/date_utils.dart';
 import 'package:milk_farm/extensions.dart';
-import 'package:milk_farm/model/customer.dart';
 import 'package:milk_farm/model/milk_data.dart';
+import 'package:milk_farm/model/state/filter_state.dart';
 import 'package:milk_farm/state/filter_state_provider.dart';
-import "package:collection/collection.dart";
+
+import 'model/customer.dart';
 
 class FilterDataScreen extends ConsumerWidget {
   const FilterDataScreen({super.key});
@@ -19,99 +20,63 @@ class FilterDataScreen extends ConsumerWidget {
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: const Text("Get Data"),
+          title: const Text("Reports"),
         ),
         body: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(
-                height: 12,
+              customerReport(context,state,stateProvider,ref),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Divider(),
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => CustomersWidget(
-                            selectCustomer: true,
-                            selectCallback: (Customer customer) {
-                              ref.read(filterStateProvider.notifier).state =
-                                  state.copyWith(customer: customer);
-                            },
-                          )));
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.people,
-                            size: 30,
-                            color: Colors.black54,
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Text(
-                            state.customer?.name ?? "Select Customer",
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w500,
-                                color: (state.customer == null)
-                                    ? Colors.grey
-                                    : Colors.black),
-                          ),
-                        ],
-                      ),
-                      const FractionallySizedBox(
-                        widthFactor: .8,
-                        child: Divider(),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      )
-                    ],
-                  ),
-                ),
-              ),
+              const Text("See Monthly Reports")
+            ],
+          ),
+        ));
+  }
+
+  Widget customerReport(BuildContext context, FilterState state, FilterStateProvider stateProvider, WidgetRef ref) {
+    return Column(children: [
+      const SizedBox(
+        height: 12,
+      ),
+      GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => CustomersWidget(
+                    selectCustomer: true,
+                    selectCallback: (Customer customer) {
+                      ref.read(filterStateProvider.notifier).state =
+                          state.copyWith(customer: customer);
+                    },
+                  )));
+        },
+        child: Container(
+          color: Colors.transparent,
+          child: Column(
+            children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      _selectStartDate(
-                          context, ref.read(filterStateProvider.notifier));
-                    },
-                    child: Column(
-                      children: [
-                        TextButton(
-                            onPressed: () {
-                              _selectStartDate(context,
-                                  ref.read(filterStateProvider.notifier));
-                            },
-                            child: const Text("Select Start Date")),
-                        Text(state.fromDate?.displayFormat ?? "-")
-                      ],
-                    ),
+                  const Icon(
+                    Icons.people,
+                    size: 30,
+                    color: Colors.black54,
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      _selectEndDate(
-                          context, ref.read(filterStateProvider.notifier));
-                    },
-                    child: Column(
-                      children: [
-                        TextButton(
-                            onPressed: () {
-                              _selectEndDate(context,
-                                  ref.read(filterStateProvider.notifier));
-                            },
-                            child: const Text("Select End Date")),
-                        Text(state.toDate?.displayFormat ?? "-")
-                      ],
-                    ),
-                  )
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Text(
+                    state.customer?.name ?? "Select Customer",
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                        color: (state.customer == null)
+                            ? Colors.grey
+                            : Colors.black),
+                  ),
                 ],
               ),
               const FractionallySizedBox(
@@ -120,32 +85,78 @@ class FilterDataScreen extends ConsumerWidget {
               ),
               const SizedBox(
                 height: 20,
-              ),
-              ElevatedButton(
-                  onPressed: (state.customer != null &&
-                          state.fromDate != null &&
-                          state.toDate != null)
-                      ? () {
-                          showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              builder: (context) {
-                                return DataScreen();
-                              });
-                          ref.read(filterStateProvider.notifier).fetchData();
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red, // Background
-                    foregroundColor: Colors.white, // Foreground
-                  ),
-                  child: const Text("Fetch Data")),
-              const SizedBox(
-                height: 20,
-              ),
+              )
             ],
           ),
-        ));
+        ),
+      ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: () {
+              _selectStartDate(context, ref.read(filterStateProvider.notifier));
+            },
+            child: Column(
+              children: [
+                TextButton(
+                    onPressed: () {
+                      _selectStartDate(
+                          context, ref.read(filterStateProvider.notifier));
+                    },
+                    child: const Text("Select Start Date")),
+                Text(state.fromDate?.displayFormat ?? "-")
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              _selectEndDate(context, ref.read(filterStateProvider.notifier));
+            },
+            child: Column(
+              children: [
+                TextButton(
+                    onPressed: () {
+                      _selectEndDate(
+                          context, ref.read(filterStateProvider.notifier));
+                    },
+                    child: const Text("Select End Date")),
+                Text(state.toDate?.displayFormat ?? "-")
+              ],
+            ),
+          )
+        ],
+      ),
+      const FractionallySizedBox(
+        widthFactor: .8,
+        child: Divider(),
+      ),
+      const SizedBox(
+        height: 20,
+      ),
+      ElevatedButton(
+          onPressed: (state.customer != null &&
+                  state.fromDate != null &&
+                  state.toDate != null)
+              ? () {
+                  showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (context) {
+                        return const DataScreen();
+                      });
+                  ref.read(filterStateProvider.notifier).fetchData();
+                }
+              : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red, // Background
+            foregroundColor: Colors.white, // Foreground
+          ),
+          child: const Text("Fetch Data")),
+      const SizedBox(
+        height: 20,
+      )
+    ]);
   }
 
   Map<String, List<MilkRecord>> getFilteredList(List<MilkRecord> records) {
@@ -389,5 +400,14 @@ class DataScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+class MonthlyReport extends StatelessWidget {
+  const MonthlyReport({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
   }
 }
